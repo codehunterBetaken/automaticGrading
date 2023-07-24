@@ -21,17 +21,17 @@ class WebRequests(object):
         pass
 
     @staticmethod
-    def get(url, params=None, headers=None, files=None):
+    def get(url, params=None, headers=None, files=None, cookies=None):
         """封装get方法，return响应码和响应内容"""
         try:
             logging.info("get url：%s" % url)
             logging.info("请求header：%s" % headers)
             logging.info("请求body：%s" % params)
-            response = requests.get(url, params=params, headers=headers, files=files)
+            response = requests.get(url, params=params, headers=headers, files=files, cookies=cookies)
             status_code = response.status_code  # 获取返回的状态码
             logging.info("获取返回的状态码:%d" % status_code)
             # 如果返回不是json格式，则不转换，直接返回内容
-            if '<!DOCTYPE html>' or '<!doctype html>' in str(response.content):
+            if '<!DOCTYPE html>' in str(response.content.decode('utf-8')) or '<!doctype html>' in str(response.content.decode('utf-8')):
                 logging.info("响应内容：%s" % str(response.content))
                 return status_code, str(response.content)
             else:
@@ -42,7 +42,7 @@ class WebRequests(object):
             logging.error("请求失败！", exc_info=1)
 
     @staticmethod
-    def post(url, data=None, headers=None, data_to_json=True):
+    def post(url, data=None, headers=None, cookies=None, data_to_json=True):
         """封装post方法，并用json格式传值，return响应码和响应内容"""
         try:
             logging.info("post url：%s" % url)
@@ -50,7 +50,7 @@ class WebRequests(object):
             logging.info("请求body：%s" % data)
             if data_to_json:
                 data = json.dumps(data, cls=CustomEncoder).encode('utf-8')  # python数据类型转化为json数据类型
-            response = requests.post(url, data=data, headers=headers)
+            response = requests.post(url, data=data, headers=headers, cookies=cookies)
             status_code = response.status_code  # 获取返回的状态码
             logging.info("获取返回的状态码:%d" % status_code)
             response_json = response.json()  # 响应内容，json类型转化成python数据类型
